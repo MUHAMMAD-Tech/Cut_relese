@@ -1,4 +1,8 @@
-import SamplePage from './pages/SamplePage';
+import HomePage from './pages/HomePage';
+import CameraInputPage from './pages/CameraInputPage';
+import ManualInputPage from './pages/ManualInputPage';
+import OptimizationResultsPage from './pages/OptimizationResultsPage';
+import MaterialDatabasePage from './pages/MaterialDatabasePage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -10,9 +14,32 @@ interface RouteConfig {
 
 const routes: RouteConfig[] = [
   {
-    name: 'Sample Page',
+    name: 'Home',
     path: '/',
-    element: <SamplePage />
+    element: <HomePage />
+  },
+  {
+    name: 'Camera Input',
+    path: '/camera/:projectId',
+    element: <CameraInputPage />,
+    visible: false
+  },
+  {
+    name: 'Manual Input',
+    path: '/manual/:projectId',
+    element: <ManualInputPage />,
+    visible: false
+  },
+  {
+    name: 'Optimization Results',
+    path: '/optimize/:projectId',
+    element: <OptimizationResultsPage />,
+    visible: false
+  },
+  {
+    name: 'Material Database',
+    path: '/materials',
+    element: <MaterialDatabasePage />
   }
 ];
 

@@ -22,7 +22,8 @@ export default function OptimizationResultsPage() {
   const [optimizationResult, setOptimizationResult] = useState<OptResult | null>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [uzbekExplanation, setUzbekExplanation] = useState<string>('');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [selectedSheetIndex, setSelectedSheetIndex] = useState(0);
+  const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
 
   useEffect(() => {
     loadData();
@@ -50,8 +51,14 @@ export default function OptimizationResultsPage() {
       if (existingResult) {
         setOptimizationResult(existingResult);
         setUzbekExplanation(existingResult.uzbek_explanation || '');
-        // Render the layout
-        setTimeout(() => renderLayout(existingResult), 100);
+        // Render all layouts
+        setTimeout(() => {
+          if (existingResult.layout_data?.sheets) {
+            existingResult.layout_data.sheets.forEach((_, index) => {
+              renderLayout(existingResult, index);
+            });
+          }
+        }, 100);
       }
     } catch (error) {
       toast({
@@ -124,12 +131,18 @@ export default function OptimizationResultsPage() {
       setOptimizationResult(savedResult);
 
       toast({
-        title: 'Optimization Complete',
-        description: `${result.sheetsRequired} sheet(s) required with ${result.wastePercentage.toFixed(1)}% waste.`,
+        title: 'Optimallashtirish tugallandi',
+        description: `${result.sheetsRequired} dona list kerak, chiqindi ${result.wastePercentage.toFixed(1)}%.`,
       });
 
-      // Render layout
-      setTimeout(() => renderLayout(savedResult), 100);
+      // Render all layouts
+      setTimeout(() => {
+        if (result.sheets) {
+          result.sheets.forEach((_, index) => {
+            renderLayout(savedResult, index);
+          });
+        }
+      }, 100);
     } catch (error) {
       console.error('Optimization error:', error);
       toast({
@@ -142,17 +155,17 @@ export default function OptimizationResultsPage() {
     }
   };
 
-  const renderLayout = (result: OptResult) => {
-    const canvas = canvasRef.current;
+  const renderLayout = (result: OptResult, sheetIndex: number) => {
+    const canvas = canvasRefs.current[sheetIndex];
     if (!canvas || !result.layout_data?.sheets) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const sheets = result.layout_data.sheets;
-    if (sheets.length === 0) return;
+    if (sheetIndex >= sheets.length) return;
 
-    const sheet = sheets[0]; // Render first sheet
+    const sheet = sheets[sheetIndex];
     const material = sheet.material;
 
     // Scale to fit canvas
@@ -238,49 +251,53 @@ export default function OptimizationResultsPage() {
   };
 
   const exportToPDF = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!optimizationResult?.layout_data?.sheets) return;
 
-    // Create a link to download the canvas as image
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `cutting-layout-${projectId}.png`;
-      link.click();
-      URL.revokeObjectURL(url);
+    // Export all sheets as separate images
+    optimizationResult.layout_data.sheets.forEach((_, index) => {
+      const canvas = canvasRefs.current[index];
+      if (!canvas) return;
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `kesish-sxemasi-list-${index + 1}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+      });
     });
 
     toast({
-      title: 'Export Complete',
-      description: 'Layout exported as PNG image.',
+      title: 'Eksport tugallandi',
+      description: `${optimizationResult.layout_data.sheets.length} dona sxema yuklab olindi.`,
     });
   };
 
   const exportToExcel = () => {
     if (!optimizationResult) return;
 
-    // Create CSV content
-    let csv = 'Detail,Width (mm),Height (mm),Quantity\n';
+    // Create CSV content in Uzbek
+    let csv = 'Detal,Kenglik (mm),Balandlik (mm),Soni\n';
     details.forEach((detail, index) => {
-      csv += `Detail ${index + 1},${detail.width_mm},${detail.height_mm},${detail.quantity}\n`;
+      csv += `Detal ${index + 1},${detail.width_mm},${detail.height_mm},${detail.quantity}\n`;
     });
     csv += `\nMaterial,${materials.find(m => m.id === selectedMaterialId)?.name}\n`;
-    csv += `Sheets Required,${optimizationResult.sheets_required}\n`;
-    csv += `Waste Percentage,${optimizationResult.waste_percentage}%\n`;
+    csv += `Listlar soni,${optimizationResult.sheets_required}\n`;
+    csv += `Chiqindi foizi,${optimizationResult.waste_percentage}%\n`;
 
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `cut-list-${projectId}.csv`;
+    link.download = `kesish-royxati-${projectId}.csv`;
     link.click();
     URL.revokeObjectURL(url);
 
     toast({
-      title: 'Export Complete',
-      description: 'Cut list exported as CSV file.',
+      title: 'Eksport tugallandi',
+      description: 'Kesish ro\'yxati CSV fayl sifatida saqlandi.',
     });
   };
 
@@ -290,7 +307,7 @@ export default function OptimizationResultsPage() {
         <div className="container mx-auto px-4 py-4">
           <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            Bosh sahifaga qaytish
           </Button>
         </div>
       </header>
@@ -298,24 +315,24 @@ export default function OptimizationResultsPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-6xl space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Optimization Results</h1>
+            <h1 className="text-3xl font-bold text-foreground">Optimallashtirish natijalari</h1>
             <p className="text-muted-foreground mt-2">
-              Review your cutting layout and export the results
+              Kesish sxemasini ko'rib chiqing va natijalarni eksport qiling
             </p>
           </div>
 
           {/* Material Selection */}
           <Card>
             <CardHeader>
-              <CardTitle>Material Selection</CardTitle>
-              <CardDescription>Choose the material sheet for optimization</CardDescription>
+              <CardTitle>Material tanlash</CardTitle>
+              <CardDescription>Optimallashtirish uchun material listini tanlang</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Material Sheet</Label>
+                <Label>Material listi</Label>
                 <Select value={selectedMaterialId} onValueChange={setSelectedMaterialId}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select material" />
+                    <SelectValue placeholder="Material tanlang" />
                   </SelectTrigger>
                   <SelectContent>
                     {materials.map((material) => (
@@ -335,10 +352,10 @@ export default function OptimizationResultsPage() {
                 {isOptimizing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Optimizing...
+                    Optimallashtirish...
                   </>
                 ) : (
-                  'Run Optimization'
+                  'Optimallashtirishni boshlash'
                 )}
               </Button>
             </CardContent>
@@ -352,7 +369,7 @@ export default function OptimizationResultsPage() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
-                      Sheets Required
+                      Kerakli listlar soni
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -365,7 +382,7 @@ export default function OptimizationResultsPage() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
-                      Waste Percentage
+                      Chiqindi foizi
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -378,7 +395,7 @@ export default function OptimizationResultsPage() {
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-medium text-muted-foreground">
-                      Used Percentage
+                      Foydalanilgan foiz
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -393,7 +410,7 @@ export default function OptimizationResultsPage() {
               {uzbekExplanation && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>AI Explanation (Uzbek)</CardTitle>
+                    <CardTitle>AI tushuntirish (O'zbekcha)</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-foreground whitespace-pre-wrap">{uzbekExplanation}</p>
@@ -401,36 +418,50 @@ export default function OptimizationResultsPage() {
                 </Card>
               )}
 
-              {/* Cutting Layout */}
+              {/* Cutting Layouts - All Sheets */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Cutting Layout</CardTitle>
-                  <CardDescription>Visual representation of the first sheet</CardDescription>
+                  <CardTitle>Kesish sxemalari</CardTitle>
+                  <CardDescription>
+                    Barcha listlar uchun vizual sxemalar ({optimizationResult.layout_data?.sheets?.length || 0} dona list)
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <canvas
-                    ref={canvasRef}
-                    width={800}
-                    height={600}
-                    className="w-full border border-border rounded-lg"
-                  />
+                <CardContent className="space-y-6">
+                  {optimizationResult.layout_data?.sheets?.map((sheet, index) => (
+                    <div key={index} className="space-y-2">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        List #{index + 1} - {sheet.material.name}
+                      </h3>
+                      <canvas
+                        ref={(el) => {
+                          canvasRefs.current[index] = el;
+                        }}
+                        width={800}
+                        height={600}
+                        className="w-full border border-border rounded-lg"
+                      />
+                      {index < (optimizationResult.layout_data?.sheets?.length || 0) - 1 && (
+                        <div className="border-b border-border mt-6" />
+                      )}
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
 
               {/* Export Options */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Export Options</CardTitle>
-                  <CardDescription>Download your cutting layout and cut list</CardDescription>
+                  <CardTitle>Eksport qilish</CardTitle>
+                  <CardDescription>Kesish sxemasi va ro'yxatini yuklab oling</CardDescription>
                 </CardHeader>
                 <CardContent className="flex gap-4">
                   <Button onClick={exportToPDF} className="gap-2">
                     <Download className="h-4 w-4" />
-                    Export Layout (PNG)
+                    Sxemalarni yuklab olish (PNG)
                   </Button>
                   <Button onClick={exportToExcel} variant="outline" className="gap-2">
                     <Table2 className="h-4 w-4" />
-                    Export Cut List (CSV)
+                    Ro'yxatni yuklab olish (CSV)
                   </Button>
                 </CardContent>
               </Card>

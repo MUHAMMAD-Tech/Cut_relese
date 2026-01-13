@@ -23,8 +23,8 @@ export default function HomePage() {
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to create project. Please try again.',
+        title: 'Xatolik',
+        description: 'Loyihani yaratib bo\'lmadi. Iltimos, qayta urinib ko\'ring.',
         variant: 'destructive',
       });
     } finally {
@@ -55,10 +55,10 @@ export default function HomePage() {
           {/* Welcome Section */}
           <div className="text-center space-y-4">
             <h2 className="text-3xl font-bold text-foreground">
-              Welcome to AI Smart Cut Optimizer
+              AI Smart Cut Optimizer'ga xush kelibsiz
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Optimize your furniture cutting layouts with AI-powered dimension detection and intelligent material usage calculation.
+              AI yordamida o'lchamlarni aniqlash va aqlli material foydalanish hisoblash bilan mebel kesish sxemalarini optimallashtiring.
             </p>
           </div>
 
@@ -69,9 +69,9 @@ export default function HomePage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary mb-4">
                   <Camera className="h-6 w-6" />
                 </div>
-                <CardTitle>Camera Input</CardTitle>
+                <CardTitle>Kamera orqali kiritish</CardTitle>
                 <CardDescription>
-                  Capture furniture detail photos and let AI detect dimensions automatically
+                  Mebel detallarining rasmini oling va AI avtomatik ravishda o'lchamlarni aniqlaydi
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -83,7 +83,7 @@ export default function HomePage() {
                     createNewProject('camera');
                   }}
                 >
-                  Start with Camera
+                  Kamera bilan boshlash
                 </Button>
               </CardContent>
             </Card>
@@ -93,9 +93,9 @@ export default function HomePage() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary/50 text-secondary-foreground mb-4">
                   <Edit3 className="h-6 w-6" />
                 </div>
-                <CardTitle>Manual Input</CardTitle>
+                <CardTitle>Qo'lda kiritish</CardTitle>
                 <CardDescription>
-                  Enter dimensions manually for quick and precise cutting optimization
+                  Tez va aniq kesish optimallashtiruvi uchun o'lchamlarni qo'lda kiriting
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -108,7 +108,7 @@ export default function HomePage() {
                     createNewProject('manual');
                   }}
                 >
-                  Start Manual Entry
+                  Qo'lda kiritishni boshlash
                 </Button>
               </CardContent>
             </Card>
@@ -117,7 +117,7 @@ export default function HomePage() {
           {/* Features Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Key Features</CardTitle>
+              <CardTitle>Asosiy imkoniyatlar</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2">
@@ -126,9 +126,9 @@ export default function HomePage() {
                     ✓
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">AI Dimension Detection</h4>
+                    <h4 className="font-semibold text-foreground">AI o'lcham aniqlash</h4>
                     <p className="text-sm text-muted-foreground">
-                      Automatic edge and corner detection with calibration support
+                      Kalibrlash qo'llab-quvvatlash bilan avtomatik chekka va burchak aniqlash
                     </p>
                   </div>
                 </div>
@@ -137,9 +137,9 @@ export default function HomePage() {
                     ✓
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Smart Optimization</h4>
+                    <h4 className="font-semibold text-foreground">Aqlli optimallashtirish</h4>
                     <p className="text-sm text-muted-foreground">
-                      Minimize waste with intelligent cutting layout algorithms
+                      Aqlli kesish sxemasi algoritmlari bilan chiqindini kamaytiring
                     </p>
                   </div>
                 </div>
@@ -148,9 +148,9 @@ export default function HomePage() {
                     ✓
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Visual Layouts</h4>
+                    <h4 className="font-semibold text-foreground">Vizual sxemalar</h4>
                     <p className="text-sm text-muted-foreground">
-                      Clear graphical cutting plans with dimensions and labels
+                      O'lchamlar va belgilar bilan aniq grafik kesish rejalari
                     </p>
                   </div>
                 </div>
@@ -159,9 +159,9 @@ export default function HomePage() {
                     ✓
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Multiple Export Formats</h4>
+                    <h4 className="font-semibold text-foreground">Ko'p eksport formatlari</h4>
                     <p className="text-sm text-muted-foreground">
-                      Export to PDF, Excel, and DXF for CNC machines
+                      PNG, CSV formatlarida eksport qiling
                     </p>
                   </div>
                 </div>
@@ -177,7 +177,7 @@ export default function HomePage() {
               className="gap-2"
             >
               <History className="h-4 w-4" />
-              View Material Database
+              Materiallar bazasini ko'rish
             </Button>
           </div>
         </div>

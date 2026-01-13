@@ -302,16 +302,16 @@ export class CuttingOptimizer {
       sizeGroups.get(sizeKey)!.push(p);
     }
 
-    // Assign colors to size groups
+    // Assign colors to size groups (vibrant professional colors like in reference)
     const colors = [
-      '#4ade80', // green
-      '#60a5fa', // blue
-      '#fbbf24', // yellow
-      '#f472b6', // pink
-      '#a78bfa', // purple
-      '#fb923c', // orange
-      '#34d399', // emerald
-      '#38bdf8', // sky
+      '#FFD700', // gold/yellow
+      '#FFA500', // orange
+      '#FF69B4', // pink
+      '#98FB98', // light green
+      '#87CEEB', // sky blue
+      '#DDA0DD', // plum
+      '#F0E68C', // khaki
+      '#FFB6C1', // light pink
     ];
 
     const sizeColorMap = new Map<string, string>();

@@ -21,18 +21,39 @@
 - [x] Step 18: Fix AI camera dimension detection (Completed)
 - [x] Step 19: Improve edge function with better prompts and error handling (Completed)
 - [x] Step 20: Convert CameraInputPage UI to Uzbek (Completed)
+- [x] Step 21: Update design to match professional reference style (Completed)
 
 ## Professional CAD/CAM Features Implemented
 1. **ZERO Unnecessary Waste**: Advanced guillotine packing algorithm fills all available space
 2. **Smart Space Filling**: Scans remaining free zones and places smaller details
 3. **Correct Text Orientation**: Dimensions displayed in proper orientation (length along length, width along width)
-4. **Uniform Coloring**: Same-sized details have the same color (e.g., all 700×450 = green, all 2000×450 = blue)
-5. **Simple Dimension Labeling**: Only dimensions shown inside pieces (format: "700 × 450"), no detail numbers
+4. **Uniform Coloring**: Same-sized details have the same color with vibrant professional palette
+5. **Professional Labeling**: Detail numbers (#1, #2, #3) at top, dimensions at center, edge labels
 6. **Color Legend**: Visual legend showing color → dimensions mapping
-7. **SketchCut Pro Style**: Professional visual layout with proper colors and borders
+7. **Professional Visual Style**: White background, dark borders, vibrant colors, hatching patterns
 8. **Anti-Waste Logic**: Multiple details fit into single sheet when possible
 9. **Automatic Rotation**: Details rotated automatically for optimal fit
 10. **Free Space Management**: Tracks and utilizes all available free spaces
+
+## Professional Design Style (Reference-Based)
+- **Background**: White sheet background (not gray)
+- **Borders**: Dark gray (#333333) thick borders (3px) for professional look
+- **Colors**: Vibrant professional palette:
+  - Gold/Yellow (#FFD700)
+  - Orange (#FFA500)
+  - Pink (#FF69B4)
+  - Light Green (#98FB98)
+  - Sky Blue (#87CEEB)
+  - Plum (#DDA0DD)
+  - Khaki (#F0E68C)
+  - Light Pink (#FFB6C1)
+- **Hatching Pattern**: Diagonal lines on every 3rd piece for visual distinction
+- **Detail Labels**: 
+  - Detail number at top (#1, #2, #3...)
+  - Main dimensions at center (bold, 16px)
+  - Edge dimensions (width at bottom, height on right side)
+- **Waste Areas**: Light gray (#f0f0f0) with dashed borders
+- **Legend**: Compact color boxes with dimension labels
 
 ## AI Dimension Detection Improvements
 - **Enhanced Prompt**: Uzbek language prompt with detailed instructions for image analysis
@@ -42,14 +63,6 @@
 - **Reference Object Detection**: Identifies A4 paper or other reference objects
 - **Detected Text Display**: Shows any text or numbers found in the image
 - **Fallback to Manual**: Gracefully handles detection failures with manual input option
-
-## Visual Styling Rules
-- **Sheet Background**: Light gray (#e5e5e5)
-- **Detail Colors**: Assigned by size group (green, blue, yellow, pink, purple, orange, emerald, sky)
-- **Waste Areas**: Light red with dashed borders
-- **Borders**: Black solid lines
-- **Text**: Bold Arial, only dimensions inside pieces
-- **Legend**: Color boxes with size labels on the right side
 
 ## Optimization Algorithm
 - **Method**: Guillotine cutting with free space tracking

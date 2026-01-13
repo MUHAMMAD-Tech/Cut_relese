@@ -179,8 +179,8 @@ export default function OptimizationResultsPage() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw sheet background (light gray)
-    ctx.fillStyle = '#e5e5e5';
+    // Draw sheet background (white)
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(
       padding,
       padding,
@@ -188,9 +188,9 @@ export default function OptimizationResultsPage() {
       material.height_mm * scale
     );
 
-    // Draw sheet border (black)
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
+    // Draw sheet border (dark gray)
+    ctx.strokeStyle = '#333333';
+    ctx.lineWidth = 3;
     ctx.strokeRect(
       padding,
       padding,
@@ -198,51 +198,85 @@ export default function OptimizationResultsPage() {
       material.height_mm * scale
     );
 
-    // RULE 1: Draw placed details with UNIFORM COLORING for same-sized details
+    // PROFESSIONAL STYLE: Draw placed details with vibrant colors
     sheet.placedDetails.forEach((detail, index) => {
       const x = padding + detail.x * scale;
       const y = padding + detail.y * scale;
       const w = detail.width * scale;
       const h = detail.height * scale;
 
-      // Use assigned color from size grouping
-      ctx.fillStyle = detail.color || '#4ade80';
+      // Use assigned vibrant color from size grouping
+      ctx.fillStyle = detail.color || '#FFD700';
       ctx.fillRect(x, y, w, h);
 
-      // Border (black)
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 1.5;
+      // Add subtle hatching pattern for some pieces (like in reference)
+      if (index % 3 === 0) {
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.lineWidth = 0.5;
+        const spacing = 8;
+        for (let i = -h; i < w; i += spacing) {
+          ctx.beginPath();
+          ctx.moveTo(x + i, y);
+          ctx.lineTo(x + i + h, y + h);
+          ctx.stroke();
+        }
+      }
+
+      // Border (dark)
+      ctx.strokeStyle = '#333333';
+      ctx.lineWidth = 2;
       ctx.strokeRect(x, y, w, h);
 
-      // RULE 2: SIMPLE DIMENSION LABELING (ONLY SIZE)
-      // Format: "700 × 450" - NO detail number, NO extra text
+      // PROFESSIONAL LABELING: Detail number and dimensions
       ctx.fillStyle = '#000000';
-      ctx.font = 'bold 16px Arial';
+      ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
       // Display dimensions in correct orientation
-      // If rotated, swap display to match visual orientation
       const displayWidth = detail.rotated ? detail.height : detail.width;
       const displayHeight = detail.rotated ? detail.width : detail.height;
+      
+      // Detail identifier (like "Г 1#" in reference)
+      const detailNum = detail.detailNumber || (index + 1);
+      const detailLabel = `#${detailNum}`;
+      
+      // Draw detail number at top (smaller)
+      ctx.font = 'bold 11px Arial';
+      ctx.fillText(detailLabel, x + w / 2, y + 15);
+      
+      // Draw dimensions at center (larger, bold)
+      ctx.font = 'bold 16px Arial';
       const dimensionLabel = `${displayWidth} × ${displayHeight}`;
-
-      // Draw ONLY dimensions at center (no detail number inside)
       ctx.fillText(dimensionLabel, x + w / 2, y + h / 2);
+
+      // Draw dimension values on edges (like in reference)
+      ctx.font = '10px Arial';
+      ctx.fillStyle = '#000000';
+      
+      // Width label at bottom
+      ctx.fillText(`${displayWidth}`, x + w / 2, y + h - 8);
+      
+      // Height label on right side
+      ctx.save();
+      ctx.translate(x + w - 8, y + h / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(`${displayHeight}`, 0, 0);
+      ctx.restore();
     });
 
-    // Draw waste areas (light red with dashed border)
+    // Draw waste areas (light gray with pattern)
     sheet.wasteAreas.forEach((waste) => {
       const x = padding + waste.x * scale;
       const y = padding + waste.y * scale;
       const w = waste.width * scale;
       const h = waste.height * scale;
 
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+      ctx.fillStyle = '#f0f0f0';
       ctx.fillRect(x, y, w, h);
       
-      // Waste border
-      ctx.strokeStyle = '#ef4444';
+      // Waste border (dashed)
+      ctx.strokeStyle = '#999999';
       ctx.lineWidth = 1;
       ctx.setLineDash([5, 5]);
       ctx.strokeRect(x, y, w, h);
@@ -250,13 +284,13 @@ export default function OptimizationResultsPage() {
     });
 
     // Draw sheet dimensions (outside)
-    ctx.fillStyle = '#333333';
-    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold 14px Arial';
     ctx.textAlign = 'center';
     
     // Top dimension (width)
     ctx.fillText(
-      `${material.width_mm} mm`,
+      `${material.width_mm}`,
       padding + (material.width_mm * scale) / 2,
       padding - 30
     );
@@ -265,11 +299,11 @@ export default function OptimizationResultsPage() {
     ctx.save();
     ctx.translate(padding - 40, padding + (material.height_mm * scale) / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText(`${material.height_mm} mm`, 0, 0);
+    ctx.fillText(`${material.height_mm}`, 0, 0);
     ctx.restore();
 
-    // Sheet title
-    ctx.font = 'bold 18px Arial';
+    // Sheet title (top left)
+    ctx.font = 'bold 16px Arial';
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'left';
     ctx.fillText(
@@ -278,31 +312,31 @@ export default function OptimizationResultsPage() {
       padding - 50
     );
 
-    // LEGEND: Draw color legend for size groups
+    // LEGEND: Draw color legend for size groups (right side)
     if (sheet.sizeColorMap) {
-      const legendX = padding + material.width_mm * scale + 20;
+      const legendX = padding + material.width_mm * scale + 30;
       let legendY = padding + 20;
       
-      ctx.font = 'bold 14px Arial';
+      ctx.font = 'bold 13px Arial';
       ctx.fillStyle = '#000000';
       ctx.textAlign = 'left';
-      ctx.fillText('Rang guruhlari:', legendX, legendY);
+      ctx.fillText('Ranglar:', legendX, legendY);
       
       legendY += 25;
-      ctx.font = '12px Arial';
+      ctx.font = '11px Arial';
       
       for (const [sizeKey, color] of Object.entries(sheet.sizeColorMap)) {
         // Draw color box
         ctx.fillStyle = color;
-        ctx.fillRect(legendX, legendY - 10, 20, 15);
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(legendX, legendY - 10, 20, 15);
+        ctx.fillRect(legendX, legendY - 12, 25, 18);
+        ctx.strokeStyle = '#333333';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(legendX, legendY - 12, 25, 18);
         
         // Draw size label
         ctx.fillStyle = '#000000';
         const [w, h] = sizeKey.split('x');
-        ctx.fillText(`${w} × ${h} mm`, legendX + 30, legendY);
+        ctx.fillText(`${w} × ${h}`, legendX + 35, legendY);
         
         legendY += 25;
       }

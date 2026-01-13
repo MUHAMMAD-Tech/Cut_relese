@@ -169,7 +169,7 @@ export default function OptimizationResultsPage() {
     const material = sheet.material;
 
     // Scale to fit canvas
-    const padding = 40;
+    const padding = 60;
     const scale = Math.min(
       (canvas.width - padding * 2) / material.width_mm,
       (canvas.height - padding * 2) / material.height_mm
@@ -179,8 +179,8 @@ export default function OptimizationResultsPage() {
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw sheet background
-    ctx.fillStyle = '#f5f5f5';
+    // Draw sheet background (light gray)
+    ctx.fillStyle = '#e5e5e5';
     ctx.fillRect(
       padding,
       padding,
@@ -188,8 +188,8 @@ export default function OptimizationResultsPage() {
       material.height_mm * scale
     );
 
-    // Draw sheet border
-    ctx.strokeStyle = '#333333';
+    // Draw sheet border (black)
+    ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
     ctx.strokeRect(
       padding,
@@ -198,56 +198,111 @@ export default function OptimizationResultsPage() {
       material.height_mm * scale
     );
 
-    // Draw placed details
+    // Draw placed details (green/blue with correct text orientation)
     sheet.placedDetails.forEach((detail, index) => {
       const x = padding + detail.x * scale;
       const y = padding + detail.y * scale;
       const w = detail.width * scale;
       const h = detail.height * scale;
 
-      // Fill detail
+      // Fill detail (alternating green/blue)
       ctx.fillStyle = index % 2 === 0 ? '#4ade80' : '#60a5fa';
       ctx.fillRect(x, y, w, h);
 
-      // Border
-      ctx.strokeStyle = '#333333';
-      ctx.lineWidth = 1;
+      // Border (black)
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(x, y, w, h);
 
-      // Label
+      // CRITICAL: Text orientation follows real dimensions
+      // Length along length, width along width
       ctx.fillStyle = '#000000';
-      ctx.font = '12px sans-serif';
+      ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      const label = `${detail.width}×${detail.height}`;
-      ctx.fillText(label, x + w / 2, y + h / 2);
+
+      // Detail number and dimensions
+      const detailNum = detail.detailNumber || (index + 1);
+      const detailLabel = `D${detailNum}`;
+      
+      // RULE: Display dimensions in correct orientation
+      // If rotated, swap display to match visual orientation
+      const displayWidth = detail.rotated ? detail.height : detail.width;
+      const displayHeight = detail.rotated ? detail.width : detail.height;
+      const dimensionLabel = `${displayWidth} × ${displayHeight}`;
+
+      // Draw detail number at top
+      ctx.fillText(detailLabel, x + w / 2, y + h / 3);
+      
+      // Draw dimensions at center
+      ctx.font = '12px Arial';
+      ctx.fillText(dimensionLabel, x + w / 2, y + h / 2 + 5);
+
+      // Draw dimension arrows/lines for clarity
+      ctx.strokeStyle = '#333333';
+      ctx.lineWidth = 1;
+      
+      // Horizontal dimension line (width)
+      const arrowY = y + h - 15;
+      ctx.beginPath();
+      ctx.moveTo(x + 5, arrowY);
+      ctx.lineTo(x + w - 5, arrowY);
+      ctx.stroke();
+      
+      // Vertical dimension line (height)
+      const arrowX = x + w - 15;
+      ctx.beginPath();
+      ctx.moveTo(arrowX, y + 5);
+      ctx.lineTo(arrowX, y + h - 5);
+      ctx.stroke();
     });
 
-    // Draw waste areas
+    // Draw waste areas (light red)
     sheet.wasteAreas.forEach((waste) => {
       const x = padding + waste.x * scale;
       const y = padding + waste.y * scale;
       const w = waste.width * scale;
       const h = waste.height * scale;
 
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.2)';
+      ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
       ctx.fillRect(x, y, w, h);
+      
+      // Waste border
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.strokeRect(x, y, w, h);
+      ctx.setLineDash([]);
     });
 
-    // Draw dimensions
-    ctx.fillStyle = '#666666';
-    ctx.font = '14px sans-serif';
+    // Draw sheet dimensions (outside)
+    ctx.fillStyle = '#333333';
+    ctx.font = 'bold 16px Arial';
     ctx.textAlign = 'center';
+    
+    // Top dimension (width)
     ctx.fillText(
       `${material.width_mm} mm`,
       padding + (material.width_mm * scale) / 2,
-      padding - 10
+      padding - 20
     );
+    
+    // Left dimension (height)
     ctx.save();
-    ctx.translate(padding - 20, padding + (material.height_mm * scale) / 2);
+    ctx.translate(padding - 30, padding + (material.height_mm * scale) / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillText(`${material.height_mm} mm`, 0, 0);
     ctx.restore();
+
+    // Sheet title
+    ctx.font = 'bold 18px Arial';
+    ctx.fillStyle = '#000000';
+    ctx.textAlign = 'left';
+    ctx.fillText(
+      `Sheet #${sheetIndex + 1} - ${material.name}`,
+      padding,
+      padding - 40
+    );
   };
 
   const exportToPDF = () => {

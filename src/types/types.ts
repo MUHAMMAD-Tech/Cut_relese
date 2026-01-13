@@ -42,6 +42,7 @@ export interface PlacedDetail {
   rotated: boolean;
   detailIndex: number;
   quantity: number;
+  detailNumber?: number;
 }
 
 export interface SheetLayout {

@@ -227,7 +227,7 @@ export default function OptimizationResultsPage() {
       ctx.lineWidth = 2;
       ctx.strokeRect(x, y, w, h);
 
-      // PROFESSIONAL LABELING: Detail number and dimensions
+      // PROFESSIONAL LABELING: Detail number and edge dimensions only
       ctx.fillStyle = '#000000';
       ctx.font = 'bold 14px Arial';
       ctx.textAlign = 'center';
@@ -242,24 +242,19 @@ export default function OptimizationResultsPage() {
       const detailLabel = `#${detailNum}`;
       
       // Draw detail number at top (smaller)
-      ctx.font = 'bold 11px Arial';
-      ctx.fillText(detailLabel, x + w / 2, y + 15);
-      
-      // Draw dimensions at center (larger, bold)
-      ctx.font = 'bold 16px Arial';
-      const dimensionLabel = `${displayWidth} × ${displayHeight}`;
-      ctx.fillText(dimensionLabel, x + w / 2, y + h / 2);
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(detailLabel, x + w / 2, y + 20);
 
-      // Draw dimension values on edges (like in reference)
-      ctx.font = '10px Arial';
+      // Draw dimension values on edges only (no center label)
+      ctx.font = 'bold 12px Arial';
       ctx.fillStyle = '#000000';
       
       // Width label at bottom
-      ctx.fillText(`${displayWidth}`, x + w / 2, y + h - 8);
+      ctx.fillText(`${displayWidth}`, x + w / 2, y + h - 10);
       
       // Height label on right side
       ctx.save();
-      ctx.translate(x + w - 8, y + h / 2);
+      ctx.translate(x + w - 10, y + h / 2);
       ctx.rotate(-Math.PI / 2);
       ctx.fillText(`${displayHeight}`, 0, 0);
       ctx.restore();

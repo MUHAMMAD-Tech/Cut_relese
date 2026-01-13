@@ -22,6 +22,7 @@
 - [x] Step 19: Improve edge function with better prompts and error handling (Completed)
 - [x] Step 20: Convert CameraInputPage UI to Uzbek (Completed)
 - [x] Step 21: Update design to match professional reference style (Completed)
+- [x] Step 22: Remove center dimension labels to avoid blocking view (Completed)
 
 ## Professional CAD/CAM Features Implemented
 1. **ZERO Unnecessary Waste**: Advanced guillotine packing algorithm fills all available space
@@ -49,9 +50,9 @@
   - Light Pink (#FFB6C1)
 - **Hatching Pattern**: Diagonal lines on every 3rd piece for visual distinction
 - **Detail Labels**: 
-  - Detail number at top (#1, #2, #3...)
-  - Main dimensions at center (bold, 16px)
-  - Edge dimensions (width at bottom, height on right side)
+  - Detail number at top (#1, #2, #3...) - bold 14px
+  - Edge dimensions only (width at bottom, height on right side) - bold 12px
+  - NO center dimension label (to avoid blocking view)
 - **Waste Areas**: Light gray (#f0f0f0) with dashed borders
 - **Legend**: Compact color boxes with dimension labels
 

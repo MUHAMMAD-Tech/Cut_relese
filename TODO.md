@@ -18,6 +18,9 @@
 - [x] Step 15: Implement uniform coloring for same-sized details (Completed)
 - [x] Step 16: Simplify dimension labeling (only size, no detail numbers inside) (Completed)
 - [x] Step 17: Add color legend for size groups (Completed)
+- [x] Step 18: Fix AI camera dimension detection (Completed)
+- [x] Step 19: Improve edge function with better prompts and error handling (Completed)
+- [x] Step 20: Convert CameraInputPage UI to Uzbek (Completed)
 
 ## Professional CAD/CAM Features Implemented
 1. **ZERO Unnecessary Waste**: Advanced guillotine packing algorithm fills all available space
@@ -30,6 +33,15 @@
 8. **Anti-Waste Logic**: Multiple details fit into single sheet when possible
 9. **Automatic Rotation**: Details rotated automatically for optimal fit
 10. **Free Space Management**: Tracks and utilizes all available free spaces
+
+## AI Dimension Detection Improvements
+- **Enhanced Prompt**: Uzbek language prompt with detailed instructions for image analysis
+- **Text Recognition**: AI can read dimensions from drawings and sketches
+- **Better Error Handling**: Comprehensive error messages and debugging information
+- **Confidence Scoring**: Shows AI confidence level for detected dimensions
+- **Reference Object Detection**: Identifies A4 paper or other reference objects
+- **Detected Text Display**: Shows any text or numbers found in the image
+- **Fallback to Manual**: Gracefully handles detection failures with manual input option
 
 ## Visual Styling Rules
 - **Sheet Background**: Light gray (#e5e5e5)

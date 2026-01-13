@@ -37,8 +37,8 @@ export default function CameraInputPage() {
       }
     } catch (error) {
       toast({
-        title: 'Camera Error',
-        description: 'Could not access camera. Please check permissions.',
+        title: 'Kamera xatosi',
+        description: 'Kameraga kirish imkoni yo\'q. Iltimos, ruxsatlarni tekshiring.',
         variant: 'destructive',
       });
     }
@@ -96,33 +96,49 @@ export default function CameraInputPage() {
 
       if (error) {
         const errorMsg = await error?.context?.text();
-        throw new Error(errorMsg || error?.message || 'Dimension detection failed');
+        console.error('Edge function xatosi:', errorMsg || error?.message);
+        throw new Error(errorMsg || error?.message || 'O\'lchamlarni aniqlashda xatolik');
       }
 
+      console.log('AI javobi:', data);
       setDetectedDimensions(data);
+
+      // Show detected text if available
+      if (data.detected_text) {
+        toast({
+          title: 'Matn aniqlandi',
+          description: `Topilgan matn: ${data.detected_text}`,
+        });
+      }
 
       if (data.confidence < 0.5) {
         toast({
-          title: 'Low Confidence',
-          description: 'AI detection has low confidence. Please verify or enter dimensions manually.',
+          title: 'Past ishonch darajasi',
+          description: data.notes || 'AI aniqlash past ishonch darajasiga ega. Iltimos, tekshiring yoki o\'lchamlarni qo\'lda kiriting.',
           variant: 'default',
+        });
+      } else if (data.width_mm > 0 && data.height_mm > 0) {
+        toast({
+          title: 'O\'lchamlar aniqlandi',
+          description: `Kenglik: ${data.width_mm}mm, Balandlik: ${data.height_mm}mm`,
         });
       } else {
         toast({
-          title: 'Dimensions Detected',
-          description: `Width: ${data.width_mm}mm, Height: ${data.height_mm}mm`,
+          title: 'O\'lchamlar topilmadi',
+          description: data.notes || 'Iltimos, o\'lchamlarni qo\'lda kiriting.',
+          variant: 'default',
         });
       }
 
       // Set manual fields with detected values
-      setManualWidth(data.width_mm.toString());
-      setManualHeight(data.height_mm.toString());
+      if (data.width_mm > 0) setManualWidth(data.width_mm.toString());
+      if (data.height_mm > 0) setManualHeight(data.height_mm.toString());
 
     } catch (error) {
-      console.error('Error processing image:', error);
+      console.error('Rasmni qayta ishlashda xatolik:', error);
       toast({
-        title: 'Processing Error',
-        description: 'Could not detect dimensions. Please enter manually.',
+        title: 'Qayta ishlash xatosi',
+        description: 'O\'lchamlarni aniqlab bo\'lmadi. Iltimos, qo\'lda kiriting.',
         variant: 'destructive',
       });
     } finally {
@@ -138,8 +154,8 @@ export default function CameraInputPage() {
 
     if (!width || !height || width <= 0 || height <= 0) {
       toast({
-        title: 'Invalid Dimensions',
-        description: 'Please enter valid width and height values.',
+        title: 'Noto\'g\'ri o\'lchamlar',
+        description: 'Iltimos, to\'g\'ri kenglik va balandlik qiymatlarini kiriting.',
         variant: 'destructive',
       });
       return;
@@ -147,8 +163,8 @@ export default function CameraInputPage() {
 
     if (quantity <= 0) {
       toast({
-        title: 'Invalid Quantity',
-        description: 'Quantity must be at least 1.',
+        title: 'Noto\'g\'ri miqdor',
+        description: 'Miqdor kamida 1 bo\'lishi kerak.',
         variant: 'destructive',
       });
       return;
@@ -165,16 +181,16 @@ export default function CameraInputPage() {
       });
 
       toast({
-        title: 'Detail Added',
-        description: 'Furniture detail saved successfully.',
+        title: 'Detal qo\'shildi',
+        description: 'Mebel detali muvaffaqiyatli saqlandi.',
       });
 
       // Navigate to optimization
       navigate(`/optimize/${projectId}`);
     } catch (error) {
       toast({
-        title: 'Save Error',
-        description: 'Failed to save detail. Please try again.',
+        title: 'Saqlash xatosi',
+        description: 'Detalni saqlab bo\'lmadi. Iltimos, qayta urinib ko\'ring.',
         variant: 'destructive',
       });
     }
@@ -186,7 +202,7 @@ export default function CameraInputPage() {
         <div className="container mx-auto px-4 py-4">
           <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            Bosh sahifaga qaytish
           </Button>
         </div>
       </header>
@@ -194,18 +210,18 @@ export default function CameraInputPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-4xl space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Camera Input</h1>
+            <h1 className="text-3xl font-bold text-foreground">Kamera orqali kiritish</h1>
             <p className="text-muted-foreground mt-2">
-              Capture a photo of your furniture detail with a reference object (like A4 paper) for accurate dimension detection.
+              Aniq o'lchamlarni aniqlash uchun mebel detalingizning rasmini ma'lumot ob'ekti (masalan, A4 qog'oz) bilan oling.
             </p>
           </div>
 
           {/* Camera/Upload Section */}
           <Card>
             <CardHeader>
-              <CardTitle>Capture Image</CardTitle>
+              <CardTitle>Rasm olish</CardTitle>
               <CardDescription>
-                Use your camera or upload an existing photo
+                Kamerangizdan foydalaning yoki mavjud rasmni yuklang
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -213,7 +229,7 @@ export default function CameraInputPage() {
                 <div className="flex gap-4">
                   <Button onClick={startCamera} className="gap-2">
                     <Camera className="h-4 w-4" />
-                    Open Camera
+                    Kamerani ochish
                   </Button>
                   <Button 
                     variant="outline" 
@@ -221,7 +237,7 @@ export default function CameraInputPage() {
                     className="gap-2"
                   >
                     <Upload className="h-4 w-4" />
-                    Upload Photo
+                    Rasm yuklash
                   </Button>
                   <input
                     ref={fileInputRef}
@@ -244,10 +260,10 @@ export default function CameraInputPage() {
                   <div className="flex gap-4">
                     <Button onClick={capturePhoto} className="gap-2">
                       <Camera className="h-4 w-4" />
-                      Capture Photo
+                      Rasm olish
                     </Button>
                     <Button variant="outline" onClick={stopCamera}>
-                      Cancel
+                      Bekor qilish
                     </Button>
                   </div>
                 </div>
@@ -257,7 +273,7 @@ export default function CameraInputPage() {
                 <div className="space-y-4">
                   <img
                     src={capturedImage}
-                    alt="Captured furniture detail"
+                    alt="Olingan mebel detali"
                     className="w-full rounded-lg border border-border"
                   />
                   <Button
@@ -269,7 +285,7 @@ export default function CameraInputPage() {
                       setManualHeight('');
                     }}
                   >
-                    Retake Photo
+                    Qayta rasm olish
                   </Button>
                 </div>
               )}
@@ -277,7 +293,7 @@ export default function CameraInputPage() {
               {isProcessing && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Processing image with AI...
+                  AI bilan rasmni qayta ishlash...
                 </div>
               )}
             </CardContent>
@@ -287,20 +303,20 @@ export default function CameraInputPage() {
           {capturedImage && !isProcessing && (
             <Card>
               <CardHeader>
-                <CardTitle>Detected Dimensions</CardTitle>
+                <CardTitle>Aniqlangan o'lchamlar</CardTitle>
                 <CardDescription>
-                  Verify or adjust the detected dimensions
+                  Aniqlangan o'lchamlarni tekshiring yoki sozlang
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {detectedDimensions && (
                   <div className="rounded-lg bg-muted p-4">
                     <p className="text-sm text-muted-foreground mb-2">
-                      AI Confidence: {Math.round((detectedDimensions.confidence || 0) * 100)}%
+                      AI ishonch darajasi: {Math.round((detectedDimensions.confidence || 0) * 100)}%
                     </p>
                     {detectedDimensions.has_reference && (
                       <p className="text-sm text-primary">
-                        ✓ Reference object detected
+                        ✓ Ma'lumot ob'ekti aniqlandi
                       </p>
                     )}
                   </div>
@@ -308,27 +324,27 @@ export default function CameraInputPage() {
 
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <Label htmlFor="width">Width (mm)</Label>
+                    <Label htmlFor="width">Kenglik (mm)</Label>
                     <Input
                       id="width"
                       type="number"
                       value={manualWidth}
                       onChange={(e) => setManualWidth(e.target.value)}
-                      placeholder="Enter width"
+                      placeholder="Kenglikni kiriting"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="height">Height (mm)</Label>
+                    <Label htmlFor="height">Balandlik (mm)</Label>
                     <Input
                       id="height"
                       type="number"
                       value={manualHeight}
                       onChange={(e) => setManualHeight(e.target.value)}
-                      placeholder="Enter height"
+                      placeholder="Balandlikni kiriting"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="quantity">Quantity</Label>
+                    <Label htmlFor="quantity">Miqdor</Label>
                     <Input
                       id="quantity"
                       type="number"
@@ -340,7 +356,7 @@ export default function CameraInputPage() {
                 </div>
 
                 <Button onClick={handleSaveDetail} className="w-full gap-2">
-                  Continue to Optimization
+                  Optimallashtirishga o'tish
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </CardContent>

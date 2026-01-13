@@ -43,6 +43,7 @@ export interface PlacedDetail {
   detailIndex: number;
   quantity: number;
   detailNumber?: number;
+  color?: string;
 }
 
 export interface SheetLayout {
@@ -50,6 +51,7 @@ export interface SheetLayout {
   material: Material;
   placedDetails: PlacedDetail[];
   wasteAreas: { x: number; y: number; width: number; height: number }[];
+  sizeColorMap?: Record<string, string>;
 }
 
 export interface OptimizationResult {

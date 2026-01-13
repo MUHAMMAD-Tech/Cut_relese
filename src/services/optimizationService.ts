@@ -283,24 +283,59 @@ export class CuttingOptimizer {
   }
 
   /**
-   * Create sheet layout with waste areas
+   * Create sheet layout with waste areas and color grouping
    */
   private createSheetLayout(
     placements: Placement[],
     material: Material,
     sheetIndex: number
   ): SheetLayout {
-    const placedDetails: PlacedDetail[] = placements.map((p) => ({
-      id: p.id,
-      x: p.x,
-      y: p.y,
-      width: p.width,
-      height: p.height,
-      rotated: p.rotated,
-      detailIndex: p.detailIndex,
-      quantity: p.quantity,
-      detailNumber: p.detailNumber,
-    }));
+    // Group placements by dimensions for color assignment
+    const sizeGroups = new Map<string, Placement[]>();
+    
+    for (const p of placements) {
+      // Create size key (normalize to always use smaller dimension first for consistency)
+      const sizeKey = `${Math.min(p.width, p.height)}x${Math.max(p.width, p.height)}`;
+      if (!sizeGroups.has(sizeKey)) {
+        sizeGroups.set(sizeKey, []);
+      }
+      sizeGroups.get(sizeKey)!.push(p);
+    }
+
+    // Assign colors to size groups
+    const colors = [
+      '#4ade80', // green
+      '#60a5fa', // blue
+      '#fbbf24', // yellow
+      '#f472b6', // pink
+      '#a78bfa', // purple
+      '#fb923c', // orange
+      '#34d399', // emerald
+      '#38bdf8', // sky
+    ];
+
+    const sizeColorMap = new Map<string, string>();
+    let colorIndex = 0;
+    for (const sizeKey of sizeGroups.keys()) {
+      sizeColorMap.set(sizeKey, colors[colorIndex % colors.length]);
+      colorIndex++;
+    }
+
+    const placedDetails: PlacedDetail[] = placements.map((p) => {
+      const sizeKey = `${Math.min(p.width, p.height)}x${Math.max(p.width, p.height)}`;
+      return {
+        id: p.id,
+        x: p.x,
+        y: p.y,
+        width: p.width,
+        height: p.height,
+        rotated: p.rotated,
+        detailIndex: p.detailIndex,
+        quantity: p.quantity,
+        detailNumber: p.detailNumber,
+        color: sizeColorMap.get(sizeKey),
+      };
+    });
 
     // Calculate waste areas
     const wasteAreas: { x: number; y: number; width: number; height: number }[] = [];
@@ -337,6 +372,7 @@ export class CuttingOptimizer {
       material,
       placedDetails,
       wasteAreas,
+      sizeColorMap: Object.fromEntries(sizeColorMap),
     };
   }
 }

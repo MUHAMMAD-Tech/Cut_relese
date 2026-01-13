@@ -15,28 +15,34 @@
 - [x] Step 12: Convert UI to Uzbek language (Completed)
 - [x] Step 13: Implement professional CAD/CAM nesting engine (Completed)
 - [x] Step 14: Add detail numbering and correct text orientation (Completed)
-
-## Notes
-- ✅ LSP dimensions corrected: 1830mm x 2750mm (was 1800mm)
-- ✅ All sheets now displayed in optimization results (not just first one)
-- ✅ UI converted to Uzbek language throughout application
-- ✅ Multiple canvas rendering for all sheets
-- ✅ Export functionality updated to save all sheets
-- ✅ All lint checks passed successfully
+- [x] Step 15: Implement uniform coloring for same-sized details (Completed)
+- [x] Step 16: Simplify dimension labeling (only size, no detail numbers inside) (Completed)
+- [x] Step 17: Add color legend for size groups (Completed)
 
 ## Professional CAD/CAM Features Implemented
 1. **ZERO Unnecessary Waste**: Advanced guillotine packing algorithm fills all available space
 2. **Smart Space Filling**: Scans remaining free zones and places smaller details
 3. **Correct Text Orientation**: Dimensions displayed in proper orientation (length along length, width along width)
-4. **Detail Numbering**: Each detail has unique number (D1, D2, D3...)
-5. **SketchCut Pro Style**: Professional visual layout with proper colors and borders
-6. **Anti-Waste Logic**: Multiple details fit into single sheet when possible
-7. **Automatic Rotation**: Details rotated automatically for optimal fit
-8. **Free Space Management**: Tracks and utilizes all available free spaces
+4. **Uniform Coloring**: Same-sized details have the same color (e.g., all 700×450 = green, all 2000×450 = blue)
+5. **Simple Dimension Labeling**: Only dimensions shown inside pieces (format: "700 × 450"), no detail numbers
+6. **Color Legend**: Visual legend showing color → dimensions mapping
+7. **SketchCut Pro Style**: Professional visual layout with proper colors and borders
+8. **Anti-Waste Logic**: Multiple details fit into single sheet when possible
+9. **Automatic Rotation**: Details rotated automatically for optimal fit
+10. **Free Space Management**: Tracks and utilizes all available free spaces
+
+## Visual Styling Rules
+- **Sheet Background**: Light gray (#e5e5e5)
+- **Detail Colors**: Assigned by size group (green, blue, yellow, pink, purple, orange, emerald, sky)
+- **Waste Areas**: Light red with dashed borders
+- **Borders**: Black solid lines
+- **Text**: Bold Arial, only dimensions inside pieces
+- **Legend**: Color boxes with size labels on the right side
 
 ## Optimization Algorithm
 - **Method**: Guillotine cutting with free space tracking
 - **Sorting**: Largest area first for optimal packing
 - **Rotation**: Automatic rotation when beneficial
 - **Kerf**: 3mm cutting width consideration
+- **Color Assignment**: Normalized size key (smaller dimension first) for consistent grouping
 - **Validation**: Ensures minimal waste before finalizing layout

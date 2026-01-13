@@ -169,7 +169,7 @@ export default function OptimizationResultsPage() {
     const material = sheet.material;
 
     // Scale to fit canvas
-    const padding = 60;
+    const padding = 80;
     const scale = Math.min(
       (canvas.width - padding * 2) / material.width_mm,
       (canvas.height - padding * 2) / material.height_mm
@@ -198,15 +198,15 @@ export default function OptimizationResultsPage() {
       material.height_mm * scale
     );
 
-    // Draw placed details (green/blue with correct text orientation)
+    // RULE 1: Draw placed details with UNIFORM COLORING for same-sized details
     sheet.placedDetails.forEach((detail, index) => {
       const x = padding + detail.x * scale;
       const y = padding + detail.y * scale;
       const w = detail.width * scale;
       const h = detail.height * scale;
 
-      // Fill detail (alternating green/blue)
-      ctx.fillStyle = index % 2 === 0 ? '#4ade80' : '#60a5fa';
+      // Use assigned color from size grouping
+      ctx.fillStyle = detail.color || '#4ade80';
       ctx.fillRect(x, y, w, h);
 
       // Border (black)
@@ -214,50 +214,24 @@ export default function OptimizationResultsPage() {
       ctx.lineWidth = 1.5;
       ctx.strokeRect(x, y, w, h);
 
-      // CRITICAL: Text orientation follows real dimensions
-      // Length along length, width along width
+      // RULE 2: SIMPLE DIMENSION LABELING (ONLY SIZE)
+      // Format: "700 × 450" - NO detail number, NO extra text
       ctx.fillStyle = '#000000';
-      ctx.font = 'bold 14px Arial';
+      ctx.font = 'bold 16px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // Detail number and dimensions
-      const detailNum = detail.detailNumber || (index + 1);
-      const detailLabel = `D${detailNum}`;
-      
-      // RULE: Display dimensions in correct orientation
+      // Display dimensions in correct orientation
       // If rotated, swap display to match visual orientation
       const displayWidth = detail.rotated ? detail.height : detail.width;
       const displayHeight = detail.rotated ? detail.width : detail.height;
       const dimensionLabel = `${displayWidth} × ${displayHeight}`;
 
-      // Draw detail number at top
-      ctx.fillText(detailLabel, x + w / 2, y + h / 3);
-      
-      // Draw dimensions at center
-      ctx.font = '12px Arial';
-      ctx.fillText(dimensionLabel, x + w / 2, y + h / 2 + 5);
-
-      // Draw dimension arrows/lines for clarity
-      ctx.strokeStyle = '#333333';
-      ctx.lineWidth = 1;
-      
-      // Horizontal dimension line (width)
-      const arrowY = y + h - 15;
-      ctx.beginPath();
-      ctx.moveTo(x + 5, arrowY);
-      ctx.lineTo(x + w - 5, arrowY);
-      ctx.stroke();
-      
-      // Vertical dimension line (height)
-      const arrowX = x + w - 15;
-      ctx.beginPath();
-      ctx.moveTo(arrowX, y + 5);
-      ctx.lineTo(arrowX, y + h - 5);
-      ctx.stroke();
+      // Draw ONLY dimensions at center (no detail number inside)
+      ctx.fillText(dimensionLabel, x + w / 2, y + h / 2);
     });
 
-    // Draw waste areas (light red)
+    // Draw waste areas (light red with dashed border)
     sheet.wasteAreas.forEach((waste) => {
       const x = padding + waste.x * scale;
       const y = padding + waste.y * scale;
@@ -284,12 +258,12 @@ export default function OptimizationResultsPage() {
     ctx.fillText(
       `${material.width_mm} mm`,
       padding + (material.width_mm * scale) / 2,
-      padding - 20
+      padding - 30
     );
     
     // Left dimension (height)
     ctx.save();
-    ctx.translate(padding - 30, padding + (material.height_mm * scale) / 2);
+    ctx.translate(padding - 40, padding + (material.height_mm * scale) / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillText(`${material.height_mm} mm`, 0, 0);
     ctx.restore();
@@ -299,10 +273,40 @@ export default function OptimizationResultsPage() {
     ctx.fillStyle = '#000000';
     ctx.textAlign = 'left';
     ctx.fillText(
-      `Sheet #${sheetIndex + 1} - ${material.name}`,
+      `List #${sheetIndex + 1} - ${material.name}`,
       padding,
-      padding - 40
+      padding - 50
     );
+
+    // LEGEND: Draw color legend for size groups
+    if (sheet.sizeColorMap) {
+      const legendX = padding + material.width_mm * scale + 20;
+      let legendY = padding + 20;
+      
+      ctx.font = 'bold 14px Arial';
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'left';
+      ctx.fillText('Rang guruhlari:', legendX, legendY);
+      
+      legendY += 25;
+      ctx.font = '12px Arial';
+      
+      for (const [sizeKey, color] of Object.entries(sheet.sizeColorMap)) {
+        // Draw color box
+        ctx.fillStyle = color;
+        ctx.fillRect(legendX, legendY - 10, 20, 15);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(legendX, legendY - 10, 20, 15);
+        
+        // Draw size label
+        ctx.fillStyle = '#000000';
+        const [w, h] = sizeKey.split('x');
+        ctx.fillText(`${w} × ${h} mm`, legendX + 30, legendY);
+        
+        legendY += 25;
+      }
+    }
   };
 
   const exportToPDF = () => {
@@ -491,8 +495,8 @@ export default function OptimizationResultsPage() {
                         ref={(el) => {
                           canvasRefs.current[index] = el;
                         }}
-                        width={800}
-                        height={600}
+                        width={1000}
+                        height={700}
                         className="w-full border border-border rounded-lg"
                       />
                       {index < (optimizationResult.layout_data?.sheets?.length || 0) - 1 && (
